@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #0f172a;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #666;
+        }
+
+        .logout-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ff4d4d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #e60000;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eef3ff;
+            border-radius: 8px;
+            color: #333;
+        }
+        canvas{
+            display: flex;
+            margin-left: 20px;
+            width: 300;
+            height: auto;
+            border-radius: 12px;
+        }
+        
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+
+#canvas {
+    
+    
+    display: block;
+    margin-top: 20px;
+    
+    
+    border-radius: 12px;
+}
+    </style>
+
+</head>
+<body>
+    
+
+<canvas id="canvas"></canvas>
+
+<script>
+const img = new Image();
+img.src = "/static/GreateWoman.jpg";
+
+let mouse = { x: null, y: null };
+
+window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+img.onload = function () {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    ctx.drawImage(img, 0, 0);
+
+    const pixelSize = 10;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    let blocks = [];
+
+    for (let y = 0; y < canvas.height; y += pixelSize) {
+        for (let x = 0; x < canvas.width; x += pixelSize) {
+
+            const i = (y * canvas.width + x) * 4;
+
+            blocks.push({
+                x: x,
+                y: y,
+                baseX: x,
+                baseY: y,
+                r: data[i],
+                g: data[i + 1],
+                b: data[i + 2],
+                vx: 0,
+                vy: 0
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        blocks.forEach(block => {
+
+            
+            let offset = Math.sin(Date.now() * 0.002 + block.x * 0.05) * 3;
+
+            
+
+            
+            const r = Math.min(block.r + 40, 255);
+            const g = Math.min(block.g + 40, 255);
+            const b = Math.min(block.b + 40, 255);
+
+            ctx.fillStyle = "rgb(" + block.r + "," + block.g + "," + block.b + ")";
+
+            ctx.fillRect(
+                block.baseX,
+                block.baseY + offset,
+                pixelSize,
+                pixelSize
+            );
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+};
+</script>
+
+
+<canvas id="bg"></canvas>
+
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const bg = document.getElementById("bg");
+const bgCtx = bg.getContext("2d");
+
+bg.width = window.innerWidth;
+bg.height = window.innerHeight;
+
+let stars = [];
+
+for (let i = 0; i < 200; i++) {
+    stars.push({
+        x: Math.random() * bg.width,
+        y: Math.random() * bg.height,
+        size: Math.random() * 2,
+        speed: Math.random() * 0.5 + 0.2
+    });
+}
+
+function animateStars() {
+    bgCtx.clearRect(0, 0, bg.width, bg.height);
+
+    stars.forEach(star => {
+        star.y += star.speed;
+
+        if (star.y > bg.height) {
+            star.y = 0;
+            star.x = Math.random() * bg.width;
+        }
+        bgCtx.shadowBlur =10;
+        bgCtx.shawdowColor ="white";
+        bgCtx.fillStyle = "white";
+        bgCtx.beginPath();
+        bgCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        bgCtx.fill();
+    });
+
+    requestAnimationFrame(animateStars);
+}
+
+animateStars();
+
+
+window.addEventListener("resize", () => {
+    bg.width = window.innerWidth;
+    bg.height = window.innerHeight;
+});
+</script>
+
+
+<div class="container">
+    <div style="text-align: center;margin-top: 20;">
+        <img src="/static/logo.png" alt="logo"
+        style="width: 120px;">
+    </div>
+
+    <h1>Welcome {{ username }}</h1>
+
+    <p>You are successfully logged in </p>
+
+    <div class="info-box">
+        <p>🔥 This is your dashboard</p>
+        
+        <p>I built a full authentication system <br>using FastAPI with session-based login, password hashing, and SQLite database.</p>
+        <p>Backend developed by @Error_11102</p>
+    </div>
+    
+
+    <a href="/logout" class="logout-btn">Logout</a>
+
+</div>
+</body>
+</html>

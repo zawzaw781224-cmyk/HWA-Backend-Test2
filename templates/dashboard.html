@@ -111,7 +111,7 @@ img.onload = function () {
 
     ctx.drawImage(img, 0, 0);
 
-    const pixelSize = 10;
+    const pixelSize = 5;
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
@@ -142,7 +142,7 @@ img.onload = function () {
         blocks.forEach(block => {
 
             
-            let offset = Math.sin(Date.now() * 0.002 + block.x * 0.05) * 3;
+            let offset = Math.sin(Date.now() * 0.002 + block.x * 0.05) * 10;
 
             
 
